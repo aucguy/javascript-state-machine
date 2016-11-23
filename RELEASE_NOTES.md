@@ -1,3 +1,29 @@
+
+      FUTURE Version 3.0.0 (ETA - Early 2017)
+      ------------------------------
+
+      I know, I know, I've neglected this library for far too long, so lets get it back on track...
+
+        ADD: Promise based async transitions
+        ADD: conditional transitions
+        ADD: observable transitions 
+        ADD: composable state machines
+        ADD: better introspection
+        ADD: undo/redo history
+        ADD: use camel casing for callback/observer methods (instead of all lower case)
+ 
+Version 2.4.0 (November 20 2016)
+--------------------------------
+
+ * added npm install instructions to readme
+ * fix for javascript error when running in jasmine/node (issue #88)
+ * exclude build files from bower install (pull request #75)
+ * ensure WILDCARD events are included in list of available transitions() (issue #93)
+ * fix FSM getting stuck into "*" state when using double wildcard (issue #64)
+ * function (fsm.states) returning list of all available states in the machine would help automated testing (issue #54)
+ * state machine hides callback exceptions (issue #62)
+ * replaced (dev dependency) YUI compressor with uglify-js for building minified version
+
 Version 2.3.5 (January 20 2014)
 -------------------------------
 

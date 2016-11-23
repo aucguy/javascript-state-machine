@@ -13,7 +13,7 @@
 
     //---------------------------------------------------------------------------
 
-    VERSION: "2.3.5",
+    VERSION: "2.4.0",
 
     //---------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
       var transitions  = {}; // track events allowed from a state            { state: [ event ] }
 
       var add = function(e) {
-        var from = (e.from instanceof Array) ? e.from : (e.from ? [e.from] : [StateMachine.WILDCARD]); // allow 'wildcard' transition if 'from' is not specified
+        var from = Array.isArray(e.from) ? e.from : (e.from ? [e.from] : [StateMachine.WILDCARD]); // allow 'wildcard' transition if 'from' is not specified
         map[e.name] = map[e.name] || {};
         for (var n = 0 ; n < from.length ; n++) {
           transitions[from[n]] = transitions[from[n]] || [];
@@ -54,6 +54,8 @@
 
           map[e.name][from[n]] = e.to || from[n]; // allow no-op transition if 'to' is not specified
         }
+        if (e.to)
+          transitions[e.to] = transitions[e.to] || [];
       };
 
       if (initial) {
@@ -75,13 +77,14 @@
       }
 
       fsm.current     = 'none';
-      fsm.is          = function(state) { return (state instanceof Array) ? (state.indexOf(this.current) >= 0) : (this.current === state); };
-      fsm.can         = function(event) { return !this.transition && (map[event].hasOwnProperty(this.current) || map[event].hasOwnProperty(StateMachine.WILDCARD)); }
+      fsm.is          = function(state) { return Array.isArray(state) ? (state.indexOf(this.current) >= 0) : (this.current === state); };
+      fsm.can         = function(event) { return !this.transition && (map[event] !== undefined) && (map[event].hasOwnProperty(this.current) || map[event].hasOwnProperty(StateMachine.WILDCARD)); }
       fsm.cannot      = function(event) { return !this.can(event); };
-      fsm.transitions = function()      { return transitions[this.current]; };
+      fsm.transitions = function()      { return (transitions[this.current] || []).concat(transitions[StateMachine.WILDCARD] || []); };
       fsm.isFinished  = function()      { return this.is(terminal); };
       fsm.tryTo       = function(event) { if(this.can(event)) this[event]();}
       fsm.error       = cfg.error || function(name, from, to, args, error, msg, e) { throw e || msg; }; // default behavior when something unexpected happens is to throw an exception, but caller can override this behavior if desired (see github issue #3 and #17)
+      fsm.states      = function() { return Object.keys(transitions).sort() };
 
       if (initial && !initial.defer)
         fsm[initial.event]();
@@ -145,7 +148,7 @@
       return function() {
 
         var from  = this.current;
-        var to    = map[from] || map[StateMachine.WILDCARD] || from;
+        var to    = map[from] || (map[StateMachine.WILDCARD] != StateMachine.WILDCARD ? map[StateMachine.WILDCARD] : from) || from;
         var args  = Array.prototype.slice.call(arguments); // turn arguments into pure array
 
         if (this.transition)

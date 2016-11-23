@@ -1,12 +1,11 @@
 {
   "name": "javascript-state-machine",
-  "version": "2.3.5",
   "homepage": "https://github.com/jakesgordon/javascript-state-machine",
   "authors": [
     "Jake Gordon <jake@codeincomplete.com>"
   ],
   "description": "a simple finite state machine library",
-  "main": "state-machine.js",
+  "main": ["state-machine.js", "state-machine.min.js"],
   "moduleType": [
     "amd",
     "globals",
@@ -23,6 +22,8 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "demo",
+    "index.html",
+    ".gitignore"
   ]
 }

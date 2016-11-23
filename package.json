@@ -13,11 +13,20 @@
     "url": "git://github.com/jakesgordon/javascript-state-machine.git"
   },
   "main": "state-machine.js",
+  "files": [
+    "state-machine.js",
+    "state-machine.min.js",
+    "LICENSE"
+  ],
   "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-contrib-concat": "^1.0.0",
-    "grunt-contrib-uglify": "^1.0.1",
-    "qunit": "~0.6.2"
+    "local-web-server": "~1.2.6",
+    "qunit": "~0.9.1",
+    "uglify-js": "^2.7.4"
   },
-  "version": "2.3.5"
+  "version": "2.4.0",
+  "scripts": {
+    "start": "ws --rewrite '/test -> /test/'",
+    "test": "node test/runner",
+    "minify": "uglifyjs state-machine.js --output state-machine.min.js --compress --mangle --stats"
+  }
 }

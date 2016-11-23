@@ -76,6 +76,9 @@ test("can & cannot", function() {
   ok(fsm.cannot('panic'), "should NOT be able to panic from red state")
   ok(fsm.can('calm'),     "should be able to calm from red state")
 
+  equal(fsm.can('jibber'),    false, "unknown event should not crash")
+  equal(fsm.cannot('jabber'), true,  "unknown event should not crash")
+
 });
 
 //-----------------------------------------------------------------------------
@@ -111,19 +114,38 @@ test("is", function() {
 
 //-----------------------------------------------------------------------------
 
+test("states", function() {
+
+  var fsm = StateMachine.create({
+    initial: 'green',
+    events: [
+      { name: 'warn',   from: 'green',  to: 'yellow' },
+      { name: 'panic',  from: 'yellow', to: 'red'    },
+      { name: 'calm',   from: 'red',    to: 'yellow' },
+      { name: 'clear',  from: 'yellow', to: 'green'  },
+      { name: 'finish', from: 'green',  to: 'done'   },
+  ]});
+
+  deepEqual(fsm.states(), [ 'done', 'green', 'none', 'red', 'yellow' ]);
+
+});
+
+//-----------------------------------------------------------------------------
+
 test("transitions", function() {
 
   var fsm = StateMachine.create({
     initial: 'green',
     events: [
-      { name: 'warn',  from: 'green',  to: 'yellow' },
-      { name: 'panic', from: 'yellow', to: 'red'    },
-      { name: 'calm',  from: 'red',    to: 'yellow' },
-      { name: 'clear', from: 'yellow', to: 'green'  }
+      { name: 'warn',   from: 'green',  to: 'yellow' },
+      { name: 'panic',  from: 'yellow', to: 'red'    },
+      { name: 'calm',   from: 'red',    to: 'yellow' },
+      { name: 'clear',  from: 'yellow', to: 'green'  },
+      { name: 'finish', from: 'green',  to: 'done'   },
   ]});
 
   equal(fsm.current, 'green', 'current state should be yellow');
-  deepEqual(fsm.transitions(), ['warn'], 'current transition(s) should be yellow');
+  deepEqual(fsm.transitions(), ['warn', 'finish'], 'current transition(s) should be yellow');
 
   fsm.warn();
   equal(fsm.current, 'yellow', 'current state should be yellow');
@@ -139,7 +161,12 @@ test("transitions", function() {
 
   fsm.clear();
   equal(fsm.current, 'green', 'current state should be green');
-  deepEqual(fsm.transitions(), ['warn'], 'current transion(s) should be warn');
+  deepEqual(fsm.transitions(), ['warn', 'finish'], 'current transion(s) should be warn');
+
+  fsm.finish();
+  equal(fsm.current, 'done', 'current state should be done');
+  deepEqual(fsm.transitions(), [], 'current transition(s) should be empty');
+
 });
 
 //-----------------------------------------------------------------------------
@@ -633,6 +660,11 @@ test("wildcard 'from' allows event from any state (github issue #11)", function(
   fsm.start();   equal(fsm.current, 'running', "start event should transition from ready to running");
   fsm.pause();   equal(fsm.current, 'paused',  "pause event should transition from running to paused");
   fsm.stop();    equal(fsm.current, 'stopped', "stop event should transition from paused to stopped");
+
+                 deepEqual(fsm.transitions(), ["prepare", "stop"], "ensure wildcard event (stop) is included in available transitions")
+  fsm.prepare(); deepEqual(fsm.transitions(), ["start",   "stop"], "ensure wildcard event (stop) is included in available transitions")
+  fsm.start();   deepEqual(fsm.transitions(), ["pause",   "stop"], "ensure wildcard event (stop) is included in available transitions")
+  fsm.stop();    deepEqual(fsm.transitions(), ["prepare", "stop"], "ensure wildcard event (stop) is included in available transitions")
 
 });
 
