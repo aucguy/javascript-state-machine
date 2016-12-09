@@ -19,6 +19,8 @@
     "LICENSE"
   ],
   "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-uglify": "^2.0.0",
     "local-web-server": "~1.2.6",
     "qunit": "~0.9.1",
     "uglify-js": "^2.7.4"
